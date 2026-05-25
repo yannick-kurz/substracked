@@ -1,0 +1,109 @@
+    {% extends "layout" %}
+
+        {% block title %}Dashboard — substracked{% endblock %}
+
+    {% block content %}
+
+<h1>Hi, {{ currentUser.firstName }}</h1>
+
+{% if upcoming is not null and upcoming is not empty %}
+<div class="upcoming-banner">
+    <div class="upcoming-banner-icon">
+        <i class="ti ti-bell" aria-hidden="true"></i>
+    </div>
+    <div class="upcoming-banner-body">
+        <p class="upcoming-banner-title">Upcoming renewals</p>
+        <p class="upcoming-banner-list">
+            {% for s in upcoming %}
+                <span>{{ s.name }} — {{ s.currency }} {{ s.amount }} on {{ s.nextRenewalDate }}</span>
+                {% if not loop.last %} · {% endif %}
+    {% endfor %}
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<div class="stats">
+    <div class="stat">
+        <p class="stat-label">Monthly spend</p>
+        <p class="stat-value accent">CHF {{ monthlyCost }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-label">Annual projected</p>
+        <p class="stat-value">CHF {{ annualCost }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-label">Active subscriptions</p>
+        <p class="stat-value">{{ subscriptions | length }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-label">Next renewal</p>
+        <p class="stat-value">
+            {% if nextRenewal is not null %}{{ nextRenewal.name }}{% else %}—{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="section-header">
+    <h2>Your subscriptions</h2>
+    <a href="/subscriptions/new" class="btn">+ Add</a>
+</div>
+
+{% if subscriptions is empty %}
+    <p>No subscriptions yet. <a href="/subscriptions/new">Add your first one.</a></p>
+{% else %}
+    <ul class="sub-list">
+        {% for sub in subscriptions %}
+        <li class="sub-item">
+            <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
+            <div class="sub-info">
+                <p class="sub-name">{{ sub.name }}</p>
+                <p class="sub-meta">{{ sub.billingCycle | lower | capitalize }}</p>
+            </div>
+            {% if sub.paidUntil is not null %}
+                <span class="renewal-tag renewal-ok">
+                    <i class="ti ti-check" aria-hidden="true"></i> paid
+                </span>
+            {% else %}
+                <span class="renewal-tag renewal-soon">unpaid</span>
+            {% endif %}
+            <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
+            <div class="sub-actions">
+                {% if sub.paidUntil is null %}
+                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-paid" method="post">
+                        <button type="submit" class="btn-icon confirm"
+                                aria-label="Mark {{ sub.name }} as paid">
+                            <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-unpaid" method="post">
+                        <button type="submit" class="btn-icon"
+                                aria-label="Mark {{ sub.name }} as unpaid">
+                            <i class="ti ti-x" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                {% endif %}
+                <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
+                   class="btn-icon" aria-label="Edit {{ sub.name }}">
+                    <i class="ti ti-edit" aria-hidden="true"></i>
+                </a>
+                {% if sub.website is not null %}
+                <a href="{{ sub.website }}" target="_blank" rel="noopener"
+                   class="btn-icon" aria-label="Open {{ sub.name }} website">
+                    <i class="ti ti-external-link" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <form action="/subscriptions/{{ sub.subscriptionId }}/delete" method="post">
+                    <button type="submit" class="btn-icon delete"
+                            aria-label="Delete {{ sub.name }}">
+                        <i class="ti ti-trash" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+    {% endblock %}

@@ -1,0 +1,163 @@
+    {% extends "layout" %}
+
+        {% block title %}Import — substracked{% endblock %}
+
+        {% block content %}
+
+<h1>Import from CSV</h1>
+
+<div class="import-grid">
+    <section class="form-card">
+        <h2>Upload bank export</h2>
+        <p class="section-hint">
+            Export a CSV from your UBS E-Banking and upload it here.
+            substracked will detect recurring payments automatically.
+        </p>
+
+        <form method="post" action="/import/csv"
+              enctype="multipart/form-data" id="import-form">
+
+            <div class="file-drop" id="file-drop">
+                <input type="file" id="file" name="file"
+                       accept=".csv" required
+                       aria-label="Upload CSV file">
+                <div class="file-drop-content" id="drop-content">
+                    <i class="ti ti-upload file-drop-icon"></i>
+                    <p class="file-drop-label">Drop your CSV here</p>
+                    <p class="file-drop-hint">or click to browse</p>
+                </div>
+                <div class="file-drop-content" id="file-chosen" style="display: none">
+                    <i class="ti ti-file-text file-drop-icon file-drop-icon--ready"></i>
+                    <p class="file-drop-label" id="file-name">file.csv</p>
+                    <p class="file-drop-hint">Click to change</p>
+                </div>
+            </div>
+
+            {% if error is defined %}
+                <p class="form-error">{{ error }}</p>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" id="submit-btn" disabled>
+                    <i class="ti ti-chart-bar"></i> Analyse
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section>
+        <h2 style="margin-bottom: var(--space-4)">How it works</h2>
+        <ol class="how-list">
+            <li class="how-item">
+                <span class="how-num">1</span>
+                <div>
+                    <p class="how-title">Export from UBS</p>
+                    <p class="how-hint">E-Banking → Transactions → Download as CSV</p>
+                </div>
+            </li>
+            <li class="how-item">
+                <span class="how-num">2</span>
+                <div>
+                    <p class="how-title">Upload the file</p>
+                    <p class="how-hint">Drop it in the upload area or click to browse</p>
+                </div>
+            </li>
+            <li class="how-item">
+                <span class="how-num">3</span>
+                <div>
+                    <p class="how-title">Review suggestions</p>
+                    <p class="how-hint">Confirm or dismiss each detected subscription</p>
+                </div>
+            </li>
+        </ol>
+
+        <p class="section-hint" style="margin-top: var(--space-5)">
+            Currently supports UBS CSV exports. More banks coming soon.
+        </p>
+    </section>
+</div>
+
+{% if suggestions is not null and suggestions is not empty %}
+<section>
+    <div class="section-header">
+        <h2>Detected subscriptions</h2>
+        <span class="badge">{{ suggestions | length }} found</span>
+    </div>
+
+    <ul class="sub-list">
+        {% for s in suggestions %}
+        <li class="sub-item">
+            <div class="sub-icon">{{ s.merchantName | slice(0, 1) | upper }}</div>
+            <div class="sub-info">
+                <p class="sub-name">{{ s.merchantName }}</p>
+                <p class="sub-meta">
+                    {{ s.detectedCycle | lower | capitalize }} ·
+                    seen {{ s.occurrenceCount }}× ·
+                    est. next {{ s.estimatedNextRenewal }}
+                </p>
+            </div>
+            <p class="sub-amount">{{ s.currency }} {{ s.amount }}</p>
+            <div class="sub-actions">
+                <form action="/import/suggestions/{{ s.id }}/confirm" method="post">
+                    <button type="submit" class="action-btn action-confirm"
+                            aria-label="Confirm {{ s.merchantName }}">
+                        <i class="ti ti-check"></i>
+                    </button>
+                </form>
+                <form action="/import/suggestions/{{ s.id }}/dismiss" method="post">
+                    <button type="submit" class="action-btn"
+                            aria-label="Dismiss {{ s.merchantName }}">
+                        <i class="ti ti-x"></i>
+                    </button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+        {% endblock %}
+
+    {% block scripts %}
+<script>
+(function () {
+    var input      = document.getElementById('file');
+    var drop       = document.getElementById('file-drop');
+    var dropContent = document.getElementById('drop-content');
+    var fileChosen = document.getElementById('file-chosen');
+    var fileName   = document.getElementById('file-name');
+    var submitBtn  = document.getElementById('submit-btn');
+
+    function showFile(name) {
+        fileName.textContent = name;
+        dropContent.style.display = 'none';
+        fileChosen.style.display  = 'flex';
+        submitBtn.disabled = false;
+    }
+
+    input.addEventListener('change', function () {
+        if (input.files.length > 0) showFile(input.files[0].name);
+    });
+
+    drop.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        drop.classList.add('file-drop--over');
+    });
+
+    drop.addEventListener('dragleave', function () {
+        drop.classList.remove('file-drop--over');
+    });
+
+    drop.addEventListener('drop', function (e) {
+        e.preventDefault();
+        drop.classList.remove('file-drop--over');
+        var files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].name.endsWith('.csv')) {
+            input.files = files;
+            showFile(files[0].name);
+        }
+    });
+}());
+</script>
+{% endblock %}

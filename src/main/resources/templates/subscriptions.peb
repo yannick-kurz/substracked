@@ -1,0 +1,74 @@
+    {% extends "layout" %}
+
+        {% block title %}Subscriptions — substracked{% endblock %}
+
+    {% block content %}
+
+<div class="section-header">
+    <h1>Subscriptions</h1>
+    <a href="/subscriptions/new" class="btn">+ Add</a>
+</div>
+
+{% if subscriptions is empty %}
+    <p>No subscriptions yet. <a href="/subscriptions/new">Add your first one.</a></p>
+{% else %}
+    <ul class="sub-list">
+        {% for sub in subscriptions %}
+        <li class="sub-item">
+            <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
+            <div class="sub-info">
+                <p class="sub-name">{{ sub.name }}</p>
+                <p class="sub-meta">
+                    {{ sub.billingCycle | lower | capitalize }}
+        {% if sub.nextRenewalDate is not null %}
+                        · renews {{ sub.nextRenewalDate }}
+        {% endif %}
+                </p>
+            </div>
+            {% if sub.paidUntil is not null %}
+                <span class="renewal-tag renewal-ok">
+                    <i class="ti ti-check" aria-hidden="true"></i> paid
+                </span>
+            {% else %}
+                <span class="renewal-tag renewal-soon">unpaid</span>
+            {% endif %}
+            <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
+            <div class="sub-actions">
+                {% if sub.paidUntil is null %}
+                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-paid" method="post">
+                        <button type="submit" class="btn-icon confirm"
+                                aria-label="Mark {{ sub.name }} as paid">
+                            <i class="ti ti-check" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-unpaid" method="post">
+                        <button type="submit" class="btn-icon"
+                                aria-label="Mark {{ sub.name }} as unpaid">
+                            <i class="ti ti-x" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                {% endif %}
+                <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
+                   class="btn-icon" aria-label="Edit {{ sub.name }}">
+                    <i class="ti ti-edit" aria-hidden="true"></i>
+                </a>
+                <a href="{{ sub.website }}" target="_blank" rel="noopener"
+                   class="btn-icon {% if sub.website is null %}btn-icon--disabled{% endif %}"
+                   aria-label="Open {{ sub.name }} website"
+                   {% if sub.website is null %}tabindex="-1"{% endif %}>
+                    <i class="ti ti-external-link" aria-hidden="true"></i>
+                </a>
+                <form action="/subscriptions/{{ sub.subscriptionId }}/delete" method="post">
+                    <button type="submit" class="btn-icon delete"
+                            aria-label="Delete {{ sub.name }}">
+                        <i class="ti ti-trash" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+    {% endblock %}

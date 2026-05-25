@@ -1,0 +1,52 @@
+    {% import "macros/nav" %}
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}substracked{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ href("/logo.svg") }}">
+    <link rel="stylesheet" href="{{ href("/style.css") }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+
+<div id="nav-hover-zone"></div>
+
+<nav id="navbar">
+    <a href="/dashboard" class="nav-logo">
+        <img src="{{ href("/logo.svg") }}"
+             alt="substracked"
+             width="32"
+             height="26">
+        substracked
+    </a>
+
+    <div class="nav-links">
+    {{ navLink("/dashboard", "Dashboard", request) }}
+    {{ navLink("/subscriptions", "Subscriptions", request) }}
+    {{ navLink("/import", "Import", request) }}
+    {{ navLink("/info", "About", request) }}
+</div>
+
+    <div class="nav-right">
+        <button class="nav-btn" id="theme-toggle"
+                onclick="toggleTheme()" aria-label="Toggle dark mode">
+            <i class="ti ti-moon" id="theme-icon"></i>
+        </button>
+
+        {{ avatarMenu(currentUser) }}
+    </div>
+
+</nav>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{{ href("/header.js") }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

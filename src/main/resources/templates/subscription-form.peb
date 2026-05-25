@@ -1,0 +1,116 @@
+    {% extends "layout" %}
+
+        {% block title %}
+            {% if subscription is not null %}Edit subscription{% else %}New subscription{% endif %}
+    — substracked
+{% endblock %}
+
+    {% block content %}
+
+<h1>
+    {% if subscription is not null %}Edit subscription{% else %}New subscription{% endif %}
+</h1>
+
+{% if error is not null %}
+    <p class="form-error">{{ error }}</p>
+{% endif %}
+
+<form method="post"
+      action="{% if subscription is not null %}/subscriptions/{{ subscription.subscriptionId }}/edit{% else %}/subscriptions/new{% endif %}"
+      class="form-card">
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name"
+                   placeholder="Netflix, Spotify..."
+                   value="{% if subscription is not null %}{{ subscription.name }}{% endif %}"
+                   required>
+        </div>
+        <div class="form-group">
+            <label for="categoryId">Category</label>
+            <select id="categoryId" name="categoryId">
+                <option value="">— none —</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                    {% if subscription is not null and subscription.categoryId == cat.id %}
+                    selected
+                    {% endif %}>
+                    {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="website">Website (optional)</label>
+            <input type="url" id="website" name="website"
+                   placeholder="https://netflix.com"
+                   value="{% if subscription is not null %}{{ subscription.website }}{% endif %}">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" name="amount"
+                   step="0.01" min="0"
+                   placeholder="0.00"
+                   value="{% if subscription is not null %}{{ subscription.amount }}{% endif %}"
+                   required>
+        </div>
+        <div class="form-group">
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency">
+                {% for c in ["CHF", "EUR", "USD", "GBP"] %}
+                <option value="{{ c }}"
+                    {% if subscription is not null and subscription.currency == c %}
+                    selected
+                    {% elseif subscription is null and c == "CHF" %}
+                    selected
+                    {% endif %}>
+                    {{ c }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="billingCycle">Billing cycle</label>
+            <select id="billingCycle" name="billingCycle">
+                {% for cycle in billingCycles %}
+                <option value="{{ cycle }}"
+                    {% if subscription is not null and subscription.billingCycle == cycle %}
+                    selected
+                    {% endif %}>
+                    {{ cycle | lower | capitalize }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nextRenewalDate">Next renewal</label>
+            <input type="date" id="nextRenewalDate" name="nextRenewalDate"
+                   value="{% if subscription is not null %}{{ subscription.nextRenewalDate }}{% endif %}"
+                   required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="notes">Notes (optional)</label>
+        <input type="text" id="notes" name="notes"
+               placeholder="Family plan, student discount..."
+               value="{% if subscription is not null %}{{ subscription.notes }}{% endif %}">
+    </div>
+
+    <div class="form-actions">
+        <a href="/subscriptions">Cancel</a>
+        <button type="submit">
+            {% if subscription is not null %}Save changes{% else %}Add subscription{% endif %}
+        </button>
+    </div>
+
+</form>
+
+{% endblock %}

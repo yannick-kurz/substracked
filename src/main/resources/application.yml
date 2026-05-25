@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/subtracked-db
+    username: subtracked-admin
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+
+pebble:
+  strict-variables: false
+
+application:
+  jwt:
+    secret: zrmjhwFb1jHt9B95xi7JrVm9b7w+3x/cdVRTkSHtmAUDS0cSRU838ije4zWbF3iE
+    expiration: 3600000
+    refresh-expiration: 604800000

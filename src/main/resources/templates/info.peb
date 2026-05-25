@@ -1,0 +1,160 @@
+    {% extends "layout" %}
+
+        {% block title %}About — substracked{% endblock %}
+
+    {% block content %}
+
+<div class="info-wrap">
+
+    <div class="info-hero">
+        <img src="{{ href("/logo.svg") }}" alt="SubsTracked Logo" width="52" height="42">
+        <div>
+            <h1 style="margin-bottom: 0.25rem">SubsTracked</h1>
+            <p class="text-muted">WEBEC FS2026 — Yannick Kurz</p>
+        </div>
+    </div>
+
+    <p class="info-lead">
+        SubsTracked hilft dir den Überblick über deine monatlichen Abonnements zu behalten —
+        von Netflix bis Gym-Abo. Erfasse Subscriptions, markiere sie als bezahlt und importiere
+        wiederkehrende Zahlungen direkt aus deinem E-Banking.
+    </p>
+
+    <section class="info-section">
+        <h2>Funktionen</h2>
+
+        <ul class="feature-list">
+            <li class="feature-item">
+                <span class="feature-icon"><i class="ti ti-layout-dashboard"></i></span>
+                <div>
+                    <p class="feature-title">Dashboard</p>
+                    <p class="feature-desc">
+                        Übersicht über monatliche und jährliche Kosten, aktive Subscriptions
+                        und bevorstehende Renewals. Ein Banner warnt dich wenn eine Zahlung
+                        in den nächsten 7 Tagen fällig ist.
+                    </p>
+                </div>
+            </li>
+            <li class="feature-item">
+                <span class="feature-icon"><i class="ti ti-list"></i></span>
+                <div>
+                    <p class="feature-title">Subscription-Verwaltung</p>
+                    <p class="feature-desc">
+                        Erstelle, bearbeite und lösche Abonnements. Erfasse Name, Betrag,
+                        Währung, Kategorie und Erneuerungsdatum. Markiere eine Subscription
+                        als bezahlt — das Renewal-Datum wird automatisch vorgerückt.
+                    </p>
+                </div>
+            </li>
+            <li class="feature-item">
+                <span class="feature-icon"><i class="ti ti-upload"></i></span>
+                <div>
+                    <p class="feature-title">CSV-Import</p>
+                    <p class="feature-desc">
+                        Lade einen CSV-Export deiner UBS E-Banking-Transaktionen hoch.
+                        SubsTracked erkennt automatisch wiederkehrende Zahlungen und schlägt
+                        sie als Subscriptions vor. Du kannst jeden Vorschlag bestätigen oder ablehnen.
+                    </p>
+                </div>
+            </li>
+            <li class="feature-item">
+                <span class="feature-icon"><i class="ti ti-user"></i></span>
+                <div>
+                    <p class="feature-title">Profil & Einstellungen</p>
+                    <p class="feature-desc">
+                        Bearbeite deinen Namen und deine E-Mail-Adresse. Wähle zwischen
+                        Light und Dark Mode. Das Theme wird im Browser gespeichert.
+                    </p>
+                </div>
+            </li>
+            <li class="feature-item">
+                <span class="feature-icon"><i class="ti ti-lock"></i></span>
+                <div>
+                    <p class="feature-title">Zusatzthema: Auth & Authorization</p>
+                    <p class="feature-desc">
+                        Registrierung und Login mit Session-basierter Authentifizierung
+                        für den Web-Layer. Zusätzlich eine vollständige JWT-Implementierung
+                        mit Access- und Refresh-Token für die REST API — geeignet für
+                        externe Clients wie mobile Apps. Passwörter werden mit BCrypt gehasht.
+                        Jede Ressource ist durch Ownership-Checks geschützt.
+                    </p>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="info-section">
+        <h2>User Journey</h2>
+        <ol class="journey-list">
+            <li class="journey-item">
+                <span class="journey-num">1</span>
+                <div>
+                    <p class="journey-title">Account erstellen</p>
+                    <p class="journey-desc">Registriere dich mit Name, E-Mail und Passwort.</p>
+                </div>
+            </li>
+            <li class="journey-item">
+                <span class="journey-num">2</span>
+                <div>
+                    <p class="journey-title">Subscriptions erfassen</p>
+                    <p class="journey-desc">
+                        Füge deine Abos manuell hinzu oder importiere sie per CSV aus dem E-Banking.
+                    </p>
+                </div>
+            </li>
+            <li class="journey-item">
+                <span class="journey-num">3</span>
+                <div>
+                    <p class="journey-title">Zahlungen verfolgen</p>
+                    <p class="journey-desc">
+                        Markiere Subscriptions als bezahlt. Das Dashboard zeigt dir
+                        bevorstehende Renewals und deine Gesamtkosten.
+                    </p>
+                </div>
+            </li>
+            <li class="journey-item">
+                <span class="journey-num">4</span>
+                <div>
+                    <p class="journey-title">Behalten Sie den Überblick</p>
+                    <p class="journey-desc">
+                        SubsTracked erinnert dich täglich an fällige Zahlungen
+                        und zeigt dir genau was du monatlich ausgibst.
+                    </p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="info-section">
+        <h2>Technologie</h2>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <p class="tech-label">Backend</p>
+                <p class="tech-value">Java 25, Spring Boot 4.0.6</p>
+            </div>
+            <div class="tech-item">
+                <p class="tech-label">Datenbank</p>
+                <p class="tech-value">PostgreSQL 17, Flyway</p>
+            </div>
+            <div class="tech-item">
+                <p class="tech-label">Templating</p>
+                <p class="tech-value">Pebble (Server-Side Rendering)</p>
+            </div>
+            <div class="tech-item">
+                <p class="tech-label">Frontend</p>
+                <p class="tech-value">HTML, CSS, Vanilla JS</p>
+            </div>
+            <div class="tech-item">
+                <p class="tech-label">Security</p>
+                <p class="tech-value">Spring Security, JWT, BCrypt</p>
+            </div>
+            <div class="tech-item">
+                <p class="tech-label">API</p>
+                <p class="tech-value">REST, Swagger UI</p>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17
+    container_name: subtracked-db
+    environment:
+      POSTGRES_DB: subtracked-db
+      POSTGRES_USER: subtracked-admin
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - subtracked_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U subtracked_user -d subtracked"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  subtracked_data:
