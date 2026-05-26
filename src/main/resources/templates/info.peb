@@ -7,15 +7,15 @@
 <div class="info-wrap">
 
     <div class="info-hero">
-        <img src="{{ href("/logo.svg") }}" alt="SubsTracked Logo" width="52" height="42">
+        <img src="{{ href("/logo.svg") }}" alt="substracked Logo" width="52" height="42">
         <div>
-            <h1 style="margin-bottom: 0.25rem">SubsTracked</h1>
+            <h1 style="margin-bottom: 0.25rem">substracked</h1>
             <p class="text-muted">WEBEC FS2026 — Yannick Kurz</p>
         </div>
     </div>
 
     <p class="info-lead">
-        SubsTracked hilft dir den Überblick über deine monatlichen Abonnements zu behalten —
+        substracked hilft dir den Überblick über deine monatlichen Abonnements zu behalten —
         von Netflix bis Gym-Abo. Erfasse Subscriptions, markiere sie als bezahlt und importiere
         wiederkehrende Zahlungen direkt aus deinem E-Banking.
     </p>
@@ -52,7 +52,7 @@
                     <p class="feature-title">CSV-Import</p>
                     <p class="feature-desc">
                         Lade einen CSV-Export deiner UBS E-Banking-Transaktionen hoch.
-                        SubsTracked erkennt automatisch wiederkehrende Zahlungen und schlägt
+                        substracked erkennt automatisch wiederkehrende Zahlungen und schlägt
                         sie als Subscriptions vor. Du kannst jeden Vorschlag bestätigen oder ablehnen.
                     </p>
                 </div>
@@ -117,42 +117,12 @@
                 <div>
                     <p class="journey-title">Behalten Sie den Überblick</p>
                     <p class="journey-desc">
-                        SubsTracked erinnert dich täglich an fällige Zahlungen
+                        substracked erinnert dich täglich an fällige Zahlungen
                         und zeigt dir genau was du monatlich ausgibst.
                     </p>
                 </div>
             </li>
         </ol>
-    </section>
-
-    <section class="info-section">
-        <h2>Technologie</h2>
-        <div class="tech-grid">
-            <div class="tech-item">
-                <p class="tech-label">Backend</p>
-                <p class="tech-value">Java 25, Spring Boot 4.0.6</p>
-            </div>
-            <div class="tech-item">
-                <p class="tech-label">Datenbank</p>
-                <p class="tech-value">PostgreSQL 17, Flyway</p>
-            </div>
-            <div class="tech-item">
-                <p class="tech-label">Templating</p>
-                <p class="tech-value">Pebble (Server-Side Rendering)</p>
-            </div>
-            <div class="tech-item">
-                <p class="tech-label">Frontend</p>
-                <p class="tech-value">HTML, CSS, Vanilla JS</p>
-            </div>
-            <div class="tech-item">
-                <p class="tech-label">Security</p>
-                <p class="tech-value">Spring Security, JWT, BCrypt</p>
-            </div>
-            <div class="tech-item">
-                <p class="tech-label">API</p>
-                <p class="tech-value">REST, Swagger UI</p>
-            </div>
-        </div>
     </section>
 
 </div>

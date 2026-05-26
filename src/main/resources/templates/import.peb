@@ -1,8 +1,8 @@
-    {% extends "layout" %}
+{% extends "layout" %}
 
-        {% block title %}Import — substracked{% endblock %}
+{% block title %}Import — substracked{% endblock %}
 
-        {% block content %}
+{% block content %}
 
 <h1>Import from CSV</h1>
 
@@ -46,7 +46,7 @@
     </section>
 
     <section>
-        <h2 style="margin-bottom: var(--space-4)">How it works</h2>
+        <h2 style="margin-bottom: var(--sp-4)">How it works</h2>
         <ol class="how-list">
             <li class="how-item">
                 <span class="how-num">1</span>
@@ -71,22 +71,22 @@
             </li>
         </ol>
 
-        <p class="section-hint" style="margin-top: var(--space-5)">
+        <p class="section-hint" style="margin-top: var(--sp-5)">
             Currently supports UBS CSV exports. More banks coming soon.
         </p>
     </section>
 </div>
 
 {% if suggestions is not null and suggestions is not empty %}
-<section>
+<section id="suggestions-section">
     <div class="section-header">
         <h2>Detected subscriptions</h2>
-        <span class="badge">{{ suggestions | length }} found</span>
+        <span class="badge" id="suggestions-count">{{ suggestions | length }} found</span>
     </div>
 
     <ul class="sub-list">
         {% for s in suggestions %}
-        <li class="sub-item">
+        <li class="sub-item" id="suggestion-{{ s.id }}">
             <div class="sub-icon">{{ s.merchantName | slice(0, 1) | upper }}</div>
             <div class="sub-info">
                 <p class="sub-name">{{ s.merchantName }}</p>
@@ -98,18 +98,16 @@
             </div>
             <p class="sub-amount">{{ s.currency }} {{ s.amount }}</p>
             <div class="sub-actions">
-                <form action="/import/suggestions/{{ s.id }}/confirm" method="post">
-                    <button type="submit" class="action-btn action-confirm"
-                            aria-label="Confirm {{ s.merchantName }}">
-                        <i class="ti ti-check"></i>
-                    </button>
-                </form>
-                <form action="/import/suggestions/{{ s.id }}/dismiss" method="post">
-                    <button type="submit" class="action-btn"
-                            aria-label="Dismiss {{ s.merchantName }}">
-                        <i class="ti ti-x"></i>
-                    </button>
-                </form>
+                <button class="btn-icon confirm"
+                        onclick="handleSuggestion('{{ s.id }}', 'confirm')"
+                        aria-label="Confirm {{ s.merchantName }}">
+                    <i class="ti ti-check"></i>
+                </button>
+                <button class="btn-icon delete"
+                        onclick="handleSuggestion('{{ s.id }}', 'dismiss')"
+                        aria-label="Dismiss {{ s.merchantName }}">
+                    <i class="ti ti-x"></i>
+                </button>
             </div>
         </li>
         {% endfor %}
@@ -117,17 +115,17 @@
 </section>
 {% endif %}
 
-        {% endblock %}
+{% endblock %}
 
-    {% block scripts %}
+{% block scripts %}
 <script>
 (function () {
-    var input      = document.getElementById('file');
-    var drop       = document.getElementById('file-drop');
+    var input       = document.getElementById('file');
+    var drop        = document.getElementById('file-drop');
     var dropContent = document.getElementById('drop-content');
-    var fileChosen = document.getElementById('file-chosen');
-    var fileName   = document.getElementById('file-name');
-    var submitBtn  = document.getElementById('submit-btn');
+    var fileChosen  = document.getElementById('file-chosen');
+    var fileName    = document.getElementById('file-name');
+    var submitBtn   = document.getElementById('submit-btn');
 
     function showFile(name) {
         fileName.textContent = name;
@@ -159,5 +157,31 @@
         }
     });
 }());
+
+function handleSuggestion(id, action) {
+    fetch('/import/suggestions/' + id + '/' + action, { method: 'POST' })
+        .then(function(res) {
+            if (!res.ok) return;
+            var item = document.getElementById('suggestion-' + id);
+            if (!item) return;
+            item.style.transition = 'opacity 0.2s, transform 0.2s';
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(1rem)';
+            setTimeout(function() {
+                item.remove();
+                // Badge aktualisieren
+                var remaining = document.querySelectorAll('[id^="suggestion-"]').length;
+                var badge = document.getElementById('suggestions-count');
+                if (badge) {
+                    if (remaining === 0) {
+                        var section = document.getElementById('suggestions-section');
+                        if (section) section.remove();
+                    } else {
+                        badge.textContent = remaining + ' found';
+                    }
+                }
+            }, 200);
+        });
+}
 </script>
 {% endblock %}

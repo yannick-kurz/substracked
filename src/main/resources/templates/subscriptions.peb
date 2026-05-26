@@ -2,7 +2,7 @@
 
         {% block title %}Subscriptions — substracked{% endblock %}
 
-    {% block content %}
+        {% block content %}
 
 <div class="section-header">
     <h1>Subscriptions</h1>
@@ -12,63 +12,208 @@
 {% if subscriptions is empty %}
     <p>No subscriptions yet. <a href="/subscriptions/new">Add your first one.</a></p>
 {% else %}
-    <ul class="sub-list">
+    <ul class="sub-list" id="sub-list">
         {% for sub in subscriptions %}
-        <li class="sub-item">
-            <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
-            <div class="sub-info">
-                <p class="sub-name">{{ sub.name }}</p>
-                <p class="sub-meta">
-                    {{ sub.billingCycle | lower | capitalize }}
-        {% if sub.nextRenewalDate is not null %}
-                        · renews {{ sub.nextRenewalDate }}
-        {% endif %}
-                </p>
-            </div>
-            {% if sub.paidUntil is not null %}
-                <span class="renewal-tag renewal-ok">
-                    <i class="ti ti-check" aria-hidden="true"></i> paid
-                </span>
-            {% else %}
-                <span class="renewal-tag renewal-soon">unpaid</span>
+        <li class="sub-item" id="sub-{{ sub.subscriptionId }}">
+
+            <div class="sub-view" id="view-{{ sub.subscriptionId }}">
+                <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
+                <div class="sub-info">
+                    <p class="sub-name">{{ sub.name }}</p>
+                    <p class="sub-meta">
+                        {{ sub.billingCycle | lower | capitalize }}
+            {% if sub.nextRenewalDate is not null %}
+                            · renews {{ sub.nextRenewalDate }}
             {% endif %}
-            <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
-            <div class="sub-actions">
-                {% if sub.paidUntil is null %}
-                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-paid" method="post">
-                        <button type="submit" class="btn-icon confirm"
-                                aria-label="Mark {{ sub.name }} as paid">
-                            <i class="ti ti-check" aria-hidden="true"></i>
-                        </button>
-                    </form>
+                    </p>
+                </div>
+                {% if sub.paidUntil is not null %}
+                    <span class="renewal-tag renewal-ok" id="tag-{{ sub.subscriptionId }}">
+                        <i class="ti ti-check" aria-hidden="true"></i> paid
+                    </span>
                 {% else %}
-                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-unpaid" method="post">
-                        <button type="submit" class="btn-icon"
-                                aria-label="Mark {{ sub.name }} as unpaid">
-                            <i class="ti ti-x" aria-hidden="true"></i>
+                    <span class="renewal-tag renewal-soon" id="tag-{{ sub.subscriptionId }}">
+                        unpaid
+                    </span>
+                {% endif %}
+                <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
+                <div class="sub-actions">
+                    <button class="btn-icon confirm"
+                            id="paid-btn-{{ sub.subscriptionId }}"
+                            onclick="togglePaid('{{ sub.subscriptionId }}', {{ sub.paidUntil is not null }})"
+                            aria-label="Toggle paid status">
+                        {% if sub.paidUntil is not null %}
+                            <i class="ti ti-x"></i>
+                        {% else %}
+                            <i class="ti ti-check"></i>
+                        {% endif %}
+                    </button>
+                    <button class="btn-icon"
+                            id="edit-btn-{{ sub.subscriptionId }}"
+                            onclick="toggleEdit('{{ sub.subscriptionId }}')"
+                            aria-label="Edit {{ sub.name }}">
+                        <i class="ti ti-edit"></i>
+                    </button>
+                    {% if sub.website is not null %}
+                    <a href="{{ sub.website }}" target="_blank" rel="noopener"
+                       class="btn-icon" aria-label="Open {{ sub.name }} website">
+                        <i class="ti ti-external-link"></i>
+                    </a>
+                    {% endif %}
+                    <form action="/subscriptions/{{ sub.subscriptionId }}/delete"
+                          method="post" style="display:contents">
+                        <button type="submit" class="btn-icon delete"
+                                aria-label="Delete {{ sub.name }}"
+                                onclick="return confirm('Delete {{ sub.name }}?')">
+                            <i class="ti ti-trash"></i>
                         </button>
                     </form>
-                {% endif %}
-                <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
-                   class="btn-icon" aria-label="Edit {{ sub.name }}">
-                    <i class="ti ti-edit" aria-hidden="true"></i>
-                </a>
-                <a href="{{ sub.website }}" target="_blank" rel="noopener"
-                   class="btn-icon {% if sub.website is null %}btn-icon--disabled{% endif %}"
-                   aria-label="Open {{ sub.name }} website"
-                   {% if sub.website is null %}tabindex="-1"{% endif %}>
-                    <i class="ti ti-external-link" aria-hidden="true"></i>
-                </a>
-                <form action="/subscriptions/{{ sub.subscriptionId }}/delete" method="post">
-                    <button type="submit" class="btn-icon delete"
-                            aria-label="Delete {{ sub.name }}">
-                        <i class="ti ti-trash" aria-hidden="true"></i>
-                    </button>
+                </div>
+            </div>
+
+            <div class="sub-edit" id="edit-{{ sub.subscriptionId }}" hidden>
+                <form action="/subscriptions/{{ sub.subscriptionId }}/edit"
+                      method="post" class="sub-edit-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name"
+                                   value="{{ sub.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" name="amount" step="0.01"
+                                   value="{{ sub.amount }}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Billing cycle</label>
+                            <select name="billingCycle">
+                                {% for cycle in billingCycles %}
+                                <option value="{{ cycle }}"
+                                    {% if sub.billingCycle == cycle %}selected{% endif %}>
+                                    {{ cycle | lower | capitalize }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Next renewal</label>
+                            <input type="date" name="nextRenewalDate"
+                                   value="{{ sub.nextRenewalDate }}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select name="categoryId">
+                                <option value="">— none —</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}"
+                                    {% if sub.categoryId == cat.id %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Currency</label>
+                            <select name="currency">
+                                {% for c in ["CHF", "EUR", "USD", "GBP"] %}
+                                <option value="{{ c }}"
+                                    {% if sub.currency == c %}selected{% endif %}>
+                                    {{ c }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Website (optional)</label>
+                            <input type="url" name="website"
+                                   value="{{ sub.website }}"
+                                   placeholder="https://netflix.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Notes (optional)</label>
+                            <input type="text" name="notes"
+                                   value="{{ sub.notes }}"
+                                   placeholder="Family plan...">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-ghost"
+                                onclick="toggleEdit('{{ sub.subscriptionId }}')">
+                            Cancel
+                        </button>
+                        <button type="submit">Save changes</button>
+                    </div>
                 </form>
             </div>
+
         </li>
         {% endfor %}
     </ul>
 {% endif %}
 
-    {% endblock %}
+        {% endblock %}
+
+    {% block scripts %}
+<script>
+var openEditId = null;
+
+function toggleEdit(id) {
+    // Wenn dieses Form bereits offen ist — schliessen
+    if (openEditId === id) {
+        closeEdit(id);
+        return;
+    }
+
+    // Anderes offenes Form zuerst schliessen
+    if (openEditId !== null) {
+        closeEdit(openEditId);
+    }
+
+    // Dieses Form öffnen
+    openEdit(id);
+}
+
+function openEdit(id) {
+    openEditId = id;
+    document.getElementById('sub-' + id).classList.add('is-editing');
+    document.getElementById('edit-' + id).hidden = false;
+    document.getElementById('edit-btn-' + id).classList.add('edit-active');
+}
+
+function closeEdit(id) {
+    openEditId = null;
+    document.getElementById('sub-' + id).classList.remove('is-editing');
+    document.getElementById('edit-' + id).hidden = true;
+    document.getElementById('edit-btn-' + id).classList.remove('edit-active');
+}
+
+function togglePaid(id, isPaid) {
+    var url = '/subscriptions/' + id + (isPaid ? '/mark-unpaid' : '/mark-paid');
+    var tag = document.getElementById('tag-' + id);
+    var btn = document.getElementById('paid-btn-' + id);
+
+    fetch(url, { method: 'POST' })
+        .then(function(res) {
+            if (!res.ok) return;
+            if (isPaid) {
+                tag.className = 'renewal-tag renewal-soon';
+                tag.innerHTML = 'unpaid';
+                btn.querySelector('i').className = 'ti ti-check';
+                btn.setAttribute('onclick', "togglePaid('" + id + "', false)");
+            } else {
+                tag.className = 'renewal-tag renewal-ok';
+                tag.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> paid';
+                btn.querySelector('i').className = 'ti ti-x';
+                btn.setAttribute('onclick', "togglePaid('" + id + "', true)");
+            }
+        });
+}
+</script>
+{% endblock %}

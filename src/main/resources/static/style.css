@@ -119,12 +119,6 @@ img, svg { display: block; max-width: 100%; }
 
 /* ─────────────────────────────────────────────────────
    BUTTONS
-   Alle gleich hoch: --control-height
-   .btn          primär lila
-   .btn-outline  lila Umrandung
-   .btn-ghost    nur Text
-   .btn-danger   rot
-   .btn-icon     quadratisch, für Edit/Delete/Confirm
 ───────────────────────────────────────────────────── */
 .btn,
 .btn-outline,
@@ -214,6 +208,9 @@ img, svg { display: block; max-width: 100%; }
     cursor: not-allowed;
     pointer-events: none;
 }
+
+/* Edit button active state — wenn form offen ist */
+.btn-icon.edit-active { color: var(--purple); }
 
 /* ─────────────────────────────────────────────────────
    FORM CONTROLS
@@ -656,6 +653,12 @@ main {
 
 .sub-item:hover { border-color: var(--purple); }
 
+/* Wenn Edit-Form offen — Item auf column umschalten */
+.sub-item.is-editing {
+    flex-direction: column;
+    align-items: stretch;
+}
+
 .sub-icon {
     width: 2.75rem;
     height: 2.75rem;
@@ -726,6 +729,23 @@ main {
     gap: var(--sp-3);
     flex-shrink: 0;
 }
+
+/* ── Inline Edit ────────────────────────────────────── */
+.sub-view {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    width: 100%;
+}
+
+.sub-edit {
+    width: 100%;
+    padding-top: var(--sp-4);
+    border-top: 0.0625rem solid var(--border);
+    margin-top: var(--sp-2);
+}
+
+.sub-edit-form { width: 100%; }
 
 /* ─────────────────────────────────────────────────────
    BADGE
@@ -881,11 +901,6 @@ main {
 
 .empty-hint { font-size: var(--text-base); color: var(--text-muted); }
 
-.action-confirm:hover {
-    border-color: var(--success);
-    color: var(--success);
-}
-
 /* ─────────────────────────────────────────────────────
    PROFILE PAGE
 ───────────────────────────────────────────────────── */
@@ -971,22 +986,8 @@ main {
 .select-sm:focus { border-color: var(--purple); }
 
 /* ─────────────────────────────────────────────────────
-   RESPONSIVE
+   INFO PAGE
 ───────────────────────────────────────────────────── */
-@media (max-width: 40rem) {
-    main            { padding-inline: var(--sp-4); }
-    #navbar         { padding-inline: var(--sp-4); }
-    .import-grid    { grid-template-columns: 1fr; }
-    .form-row       { grid-template-columns: 1fr; }
-    .stats          { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 24rem) {
-    .stats          { grid-template-columns: 1fr; }
-    .nav-search     { display: none; }
-}
-
-/* ── Info Page ──────────────────────────────────────── */
 .info-wrap {
     max-width: 44rem;
     margin-inline: auto;
@@ -1016,7 +1017,6 @@ main {
     border-bottom: 0.0625rem solid var(--border);
 }
 
-/* Feature list */
 .feature-list {
     list-style: none;
     display: flex;
@@ -1041,25 +1041,11 @@ main {
     font-size: var(--text-lg);
     flex-shrink: 0;
 }
+[data-theme="dark"] .feature-icon { background: #2a2645; color: #9F99E8; }
 
-[data-theme="dark"] .feature-icon {
-    background: #2a2645;
-    color: #9F99E8;
-}
+.feature-title { font-size: var(--text-base); font-weight: 500; margin-bottom: var(--sp-1); }
+.feature-desc  { font-size: var(--text-sm); color: var(--text-muted); line-height: var(--leading-normal); }
 
-.feature-title {
-    font-size: var(--text-base);
-    font-weight: 500;
-    margin-bottom: var(--sp-1);
-}
-
-.feature-desc {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    line-height: var(--leading-normal);
-}
-
-/* Journey list */
 .journey-list {
     list-style: none;
     display: flex;
@@ -1067,11 +1053,7 @@ main {
     gap: var(--sp-4);
 }
 
-.journey-item {
-    display: flex;
-    gap: var(--sp-4);
-    align-items: flex-start;
-}
+.journey-item { display: flex; gap: var(--sp-4); align-items: flex-start; }
 
 .journey-num {
     width: 2rem;
@@ -1086,18 +1068,9 @@ main {
     flex-shrink: 0;
 }
 
-.journey-title {
-    font-size: var(--text-base);
-    font-weight: 500;
-    margin-bottom: var(--sp-1);
-}
+.journey-title { font-size: var(--text-base); font-weight: 500; margin-bottom: var(--sp-1); }
+.journey-desc  { font-size: var(--text-sm); color: var(--text-muted); }
 
-.journey-desc {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-}
-
-/* Tech grid */
 .tech-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
@@ -1111,13 +1084,21 @@ main {
     padding: var(--sp-4);
 }
 
-.tech-label {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    margin-bottom: var(--sp-1);
+.tech-label { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--sp-1); }
+.tech-value { font-size: var(--text-sm); font-weight: 500; }
+
+/* ─────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────── */
+@media (max-width: 40rem) {
+    main            { padding-inline: var(--sp-4); }
+    #navbar         { padding-inline: var(--sp-4); }
+    .import-grid    { grid-template-columns: 1fr; }
+    .form-row       { grid-template-columns: 1fr; }
+    .stats          { grid-template-columns: 1fr 1fr; }
 }
 
-.tech-value {
-    font-size: var(--text-sm);
-    font-weight: 500;
+@media (max-width: 24rem) {
+    .stats          { grid-template-columns: 1fr; }
+    .nav-search     { display: none; }
 }

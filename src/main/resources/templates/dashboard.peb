@@ -2,7 +2,7 @@
 
         {% block title %}Dashboard — substracked{% endblock %}
 
-    {% block content %}
+        {% block content %}
 
 <h1>Hi, {{ currentUser.firstName }}</h1>
 
@@ -17,7 +17,7 @@
             {% for s in upcoming %}
                 <span>{{ s.name }} — {{ s.currency }} {{ s.amount }} on {{ s.nextRenewalDate }}</span>
                 {% if not loop.last %} · {% endif %}
-    {% endfor %}
+        {% endfor %}
         </p>
     </div>
 </div>
@@ -61,43 +61,42 @@
                 <p class="sub-meta">{{ sub.billingCycle | lower | capitalize }}</p>
             </div>
             {% if sub.paidUntil is not null %}
-                <span class="renewal-tag renewal-ok">
+                <span class="renewal-tag renewal-ok" id="tag-{{ sub.subscriptionId }}">
                     <i class="ti ti-check" aria-hidden="true"></i> paid
                 </span>
             {% else %}
-                <span class="renewal-tag renewal-soon">unpaid</span>
+                <span class="renewal-tag renewal-soon" id="tag-{{ sub.subscriptionId }}">
+                    unpaid
+                </span>
             {% endif %}
             <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
             <div class="sub-actions">
-                {% if sub.paidUntil is null %}
-                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-paid" method="post">
-                        <button type="submit" class="btn-icon confirm"
-                                aria-label="Mark {{ sub.name }} as paid">
-                            <i class="ti ti-check" aria-hidden="true"></i>
-                        </button>
-                    </form>
-                {% else %}
-                    <form action="/subscriptions/{{ sub.subscriptionId }}/mark-unpaid" method="post">
-                        <button type="submit" class="btn-icon"
-                                aria-label="Mark {{ sub.name }} as unpaid">
-                            <i class="ti ti-x" aria-hidden="true"></i>
-                        </button>
-                    </form>
-                {% endif %}
+                <button class="btn-icon confirm"
+                        id="paid-btn-{{ sub.subscriptionId }}"
+                        onclick="togglePaid('{{ sub.subscriptionId }}', {{ sub.paidUntil is not null }})"
+                        aria-label="Toggle paid status">
+                    {% if sub.paidUntil is not null %}
+                        <i class="ti ti-x"></i>
+                    {% else %}
+                        <i class="ti ti-check"></i>
+                    {% endif %}
+                </button>
                 <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
                    class="btn-icon" aria-label="Edit {{ sub.name }}">
-                    <i class="ti ti-edit" aria-hidden="true"></i>
+                    <i class="ti ti-edit"></i>
                 </a>
                 {% if sub.website is not null %}
                 <a href="{{ sub.website }}" target="_blank" rel="noopener"
                    class="btn-icon" aria-label="Open {{ sub.name }} website">
-                    <i class="ti ti-external-link" aria-hidden="true"></i>
+                    <i class="ti ti-external-link"></i>
                 </a>
                 {% endif %}
-                <form action="/subscriptions/{{ sub.subscriptionId }}/delete" method="post">
+                <form action="/subscriptions/{{ sub.subscriptionId }}/delete"
+                      method="post" style="display:contents">
                     <button type="submit" class="btn-icon delete"
-                            aria-label="Delete {{ sub.name }}">
-                        <i class="ti ti-trash" aria-hidden="true"></i>
+                            aria-label="Delete {{ sub.name }}"
+                            onclick="return confirm('Delete {{ sub.name }}?')">
+                        <i class="ti ti-trash"></i>
                     </button>
                 </form>
             </div>
@@ -106,4 +105,31 @@
     </ul>
 {% endif %}
 
-    {% endblock %}
+        {% endblock %}
+
+        {% block scripts %}
+<script>
+function togglePaid(id, isPaid) {
+    var url = '/subscriptions/' + id + (isPaid ? '/mark-unpaid' : '/mark-paid');
+    var tag = document.getElementById('tag-' + id);
+    var btn = document.getElementById('paid-btn-' + id);
+
+    fetch(url, { method: 'POST' })
+        .then(function(res) {
+            if (!res.ok) return;
+            if (isPaid) {
+                tag.className = 'renewal-tag renewal-soon';
+                tag.innerHTML = 'unpaid';
+                btn.querySelector('i').className = 'ti ti-check';
+                btn.setAttribute('onclick', "togglePaid('" + id + "', false)");
+            } else {
+                tag.className = 'renewal-tag renewal-ok';
+                tag.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> paid';
+                btn.querySelector('i').className = 'ti ti-x';
+                btn.setAttribute('onclick', "togglePaid('" + id + "', true)");
+            }
+        });
+}
+</script>
+{% endblock %}
+-e
