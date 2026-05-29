@@ -3,6 +3,9 @@ package ch.yannick.subtracked.app.subscription;
 import ch.yannick.subtracked.app.exception.ResourceNotFoundException;
 import ch.yannick.subtracked.app.subscription.dto.SubscriptionRequest;
 import ch.yannick.subtracked.app.subscription.dto.SubscriptionResponse;
+import ch.yannick.subtracked.domain.payment.Payment;
+import ch.yannick.subtracked.domain.payment.PaymentRepository;
+import ch.yannick.subtracked.domain.payment.PaymentResponse;
 import ch.yannick.subtracked.domain.subscription.BillingCycle;
 import ch.yannick.subtracked.domain.subscription.Subscription;
 import ch.yannick.subtracked.domain.subscription.SubscriptionRepository;
@@ -19,11 +22,13 @@ import java.util.UUID;
 public class SubscriptionService {
 
     private final SubscriptionRepository repository;
+    private final PaymentRepository paymentRepository;
     private final SubscriptionConverter converter;
 
-    public SubscriptionService(SubscriptionRepository repository,
+    public SubscriptionService(SubscriptionRepository repository, PaymentRepository paymentRepository,
                                SubscriptionConverter converter) {
         this.repository = repository;
+        this.paymentRepository = paymentRepository;
         this.converter = converter;
     }
 
@@ -94,9 +99,33 @@ public class SubscriptionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Subscription not found: " + id));
 
-        sub.setPaidUntil(sub.getNextRenewalDate());
-        sub.setNextRenewalDate(nextDate(sub.getNextRenewalDate(), sub.getBillingCycle()));
+        LocalDate renewalDate = sub.getNextRenewalDate();
+
+        Payment payment = new Payment();
+        payment.setUser(user);
+        payment.setSubscriptionId(sub.getId());
+        payment.setSubscriptionName(sub.getName());
+        payment.setAmount(sub.getAmount());
+        payment.setCurrency(sub.getCurrency());
+        payment.setPaidOn(renewalDate);
+        paymentRepository.save(payment);
+
+        sub.setNextRenewalDate(nextDate(renewalDate, sub.getBillingCycle()));
         repository.save(sub);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getRecentPayments(User user, int limit) {
+        return paymentRepository.findTop5ByUserIdOrderByPaidOnDesc(user.getId())
+                .stream()
+                .map(p -> new PaymentResponse(
+                        p.getId(),
+                        p.getSubscriptionId(),
+                        p.getSubscriptionName(),
+                        p.getAmount(),
+                        p.getCurrency(),
+                        p.getPaidOn()))
+                .toList();
     }
 
     @Transactional

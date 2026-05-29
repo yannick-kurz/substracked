@@ -4,17 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}substracked{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ href("/logo.svg") }}">
     <link rel="stylesheet" href="{{ href("/style.css") }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body class="auth-body">
 
+<button class="auth-theme-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+
 <div id="auth-wrap">
-    <p class="auth-brand">substracked</p>
+    <a href="/auth/login" class="auth-brand">
+        <img src="{{ href("/logo.svg") }}"
+             alt="substracked"
+             width="36"
+             height="29">
+        substracked
+    </a>
     <main>
         <h1>{% block title %}{% endblock %}</h1>
         {% block content %}{% endblock %}
     </main>
 </div>
+
+<script>
+(function () {
+    function updateIcon(theme) {
+        var icon = document.getElementById('theme-icon');
+        if (icon) icon.className = theme === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
+    }
+
+    window.toggleTheme = function () {
+        var html = document.documentElement;
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('substracked-theme', next);
+        updateIcon(next);
+    };
+
+    var saved = localStorage.getItem('substracked-theme');
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        updateIcon(saved);
+    }
+}());
+</script>
 
 </body>
 </html>

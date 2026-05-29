@@ -24,7 +24,7 @@ public class OpenApiConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("SubsTracked API")
+                .title("substracked API")
                 .description("Subscription tracker with finance dashboard extension")
                 .version("1.0.0")
                 .contact(new Contact()

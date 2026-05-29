@@ -8,7 +8,7 @@
 </div>
 {% endmacro %}
 
-    {% macro avatarMenu(currentUser) %}
+        {% macro avatarMenu(currentUser) %}
 <div class="avatar-wrap" id="avatar-wrap">
     <button class="nav-avatar" id="avatar-btn"
             onclick="toggleAvatarMenu()"
@@ -26,9 +26,58 @@
         <a href="/profile" class="avatar-menu-item">
             <i class="ti ti-user" aria-hidden="true"></i> Profile
         </a>
+        <a href="/payments" class="avatar-menu-item">
+            <i class="ti ti-receipt" aria-hidden="true"></i> Payments
+        </a>
         <a href="/auth/logout" class="avatar-menu-item avatar-menu-item--danger">
             <i class="ti ti-logout" aria-hidden="true"></i> Sign out
         </a>
+    </div>
+</div>
+{% endmacro %}
+
+    {% macro notificationBell(upcoming) %}
+<div class="notif-wrap" id="notif-wrap">
+    <button class="nav-btn notif-btn" id="notif-btn"
+            onclick="toggleNotifications()"
+            aria-label="Notifications"
+            aria-haspopup="true"
+            aria-expanded="false">
+        <i class="ti ti-bell" id="notif-icon"></i>
+        {% if upcoming is not null and upcoming is not empty %}
+        <span class="notif-badge" id="notif-badge">{{ upcoming | length }}</span>
+        {% endif %}
+    </button>
+    <div class="notif-menu" id="notif-menu" hidden>
+        <div class="notif-header">
+            <p class="notif-title">Notifications</p>
+            {% if upcoming is not null and upcoming is not empty %}
+            <span class="badge">{{ upcoming | length }}</span>
+            {% endif %}
+        </div>
+        {% if upcoming is null or upcoming is empty %}
+        <div class="notif-empty">
+            <i class="ti ti-bell-off"></i>
+            <p>No upcoming renewals</p>
+        </div>
+        {% else %}
+        <ul class="notif-list">
+            {% for s in upcoming %}
+            <li class="notif-item">
+                <div class="notif-item-icon">
+                    <i class="ti ti-refresh" aria-hidden="true"></i>
+                </div>
+                <div class="notif-item-body">
+                    <p class="notif-item-title">{{ s.name }} renews soon</p>
+                    <p class="notif-item-sub">{{ s.nextRenewalDate }} · {{ s.currency }} {{ s.amount }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="notif-footer">
+            <a href="/subscriptions">View all subscriptions</a>
+        </div>
     </div>
 </div>
 {% endmacro %}

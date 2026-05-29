@@ -1,0 +1,61 @@
+    {% extends "layout" %}
+
+        {% block title %}Payments — substracked{% endblock %}
+
+    {% block content %}
+
+<div class="section-header">
+    <h1>Payment history</h1>
+</div>
+
+<div class="payment-summary">
+    <div class="stat">
+        <p class="stat-label">This month</p>
+        <p class="stat-value accent">CHF {{ thisMonthTotal }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-label">Last month</p>
+        <p class="stat-value">CHF {{ lastMonthTotal }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-label">Total payments</p>
+        <p class="stat-value">{{ payments | length }}</p>
+    </div>
+</div>
+
+{% if payments is empty %}
+    <p class="empty-hint">No payments logged yet. Mark a subscription as paid to get started.</p>
+{% else %}
+        {% set currentMonth = "" %}
+    <ul class="payment-list">
+        {% for p in payments %}
+            {% if p.paidOn | date("MMMM yyyy") != currentMonth %}
+                {% set currentMonth = p.paidOn | date("MMMM yyyy") %}
+                <li>
+                    <p class="payment-month-label">{{ currentMonth }}</p>
+                </li>
+            {% endif %}
+            <li class="payment-item" id="payment-{{ p.id }}">
+                <div class="payment-icon">
+                    <i class="ti ti-check" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <p class="payment-name">{{ p.subscriptionName }}</p>
+                    <p class="payment-date">{{ p.paidOn }}</p>
+                </div>
+                <p class="payment-amount">{{ p.currency }} {{ p.amount }}</p>
+                <div>
+                    <form action="/payments/{{ p.id }}/delete" method="post">
+                        <button type="submit" class="btn-icon delete"
+                                aria-label="Remove payment log"
+                                onclick="return confirm('Remove this payment entry?')">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+    {% endblock %}

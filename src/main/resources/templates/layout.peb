@@ -24,13 +24,21 @@
     </a>
 
     <div class="nav-links">
-    {{ navLink("/dashboard", "Dashboard", request) }}
-    {{ navLink("/subscriptions", "Subscriptions", request) }}
-    {{ navLink("/import", "Import", request) }}
-    {{ navLink("/info", "About", request) }}
-</div>
+        {{ navLink("/dashboard",     "Dashboard",     request) }}
+        {{ navLink("/subscriptions", "Subscriptions", request) }}
+        {{ navLink("/payments",      "Payments",      request) }}
+        {{ navLink("/import",        "Import",        request) }}
+        {{ navLink("/info",          "About",         request) }}
+    </div>
 
     <div class="nav-right">
+        <div class="nav-search">
+            <i class="ti ti-search" aria-hidden="true"></i>
+            <input type="text" placeholder="Search..." autocomplete="off">
+        </div>
+
+        {{ notificationBell(upcoming) }}
+
         <button class="nav-btn" id="theme-toggle"
                 onclick="toggleTheme()" aria-label="Toggle dark mode">
             <i class="ti ti-moon" id="theme-icon"></i>
@@ -38,7 +46,6 @@
 
         {{ avatarMenu(currentUser) }}
     </div>
-
 </nav>
 
 <main>

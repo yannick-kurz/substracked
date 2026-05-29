@@ -2,134 +2,117 @@
 
         {% block title %}Dashboard — substracked{% endblock %}
 
-        {% block content %}
+    {% block content %}
 
-<h1>Hi, {{ currentUser.firstName }}</h1>
-
-{% if upcoming is not null and upcoming is not empty %}
-<div class="upcoming-banner">
-    <div class="upcoming-banner-icon">
-        <i class="ti ti-bell" aria-hidden="true"></i>
+<div class="dash-header">
+    <div>
+        <h1>Good morning, {{ currentUser.firstName }}</h1>
+        <p class="text-muted">Here's what's happening with your subscriptions.</p>
     </div>
-    <div class="upcoming-banner-body">
-        <p class="upcoming-banner-title">Upcoming renewals</p>
-        <p class="upcoming-banner-list">
-            {% for s in upcoming %}
-                <span>{{ s.name }} — {{ s.currency }} {{ s.amount }} on {{ s.nextRenewalDate }}</span>
-                {% if not loop.last %} · {% endif %}
-        {% endfor %}
-        </p>
-    </div>
+    <a href="/subscriptions/new" class="btn">+ Add subscription</a>
 </div>
-{% endif %}
 
 <div class="stats">
     <div class="stat">
         <p class="stat-label">Monthly spend</p>
         <p class="stat-value accent">CHF {{ monthlyCost }}</p>
+        <p class="stat-sub">{{ subscriptions | length }} active subscriptions</p>
     </div>
     <div class="stat">
         <p class="stat-label">Annual projected</p>
         <p class="stat-value">CHF {{ annualCost }}</p>
-    </div>
-    <div class="stat">
-        <p class="stat-label">Active subscriptions</p>
-        <p class="stat-value">{{ subscriptions | length }}</p>
+        <p class="stat-sub">based on current subscriptions</p>
     </div>
     <div class="stat">
         <p class="stat-label">Next renewal</p>
         <p class="stat-value">
             {% if nextRenewal is not null %}{{ nextRenewal.name }}{% else %}—{% endif %}
         </p>
+        {% if nextRenewal is not null %}
+        <p class="stat-sub">{{ nextRenewal.nextRenewalDate }} · CHF {{ nextRenewal.amount }}</p>
+        {% endif %}
+    </div>
+    <div class="stat">
+        <p class="stat-label">This month paid</p>
+        <p class="stat-value">CHF {{ thisMonthPaid }}</p>
+        <p class="stat-sub"><a href="/payments">View all payments</a></p>
     </div>
 </div>
 
-<div class="section-header">
-    <h2>Your subscriptions</h2>
-    <a href="/subscriptions/new" class="btn">+ Add</a>
+<div class="dash-grid">
+
+    <section class="dash-section">
+        <div class="section-header">
+            <h2>Subscriptions</h2>
+            <a href="/subscriptions" class="btn-ghost">View all <i class="ti ti-arrow-right"></i></a>
+        </div>
+
+        {% if subscriptions is empty %}
+            <div class="dash-empty">
+                <i class="ti ti-credit-card-off"></i>
+                <p>No subscriptions yet.</p>
+                <a href="/subscriptions/new" class="btn-outline">Add your first one</a>
+            </div>
+        {% else %}
+            <ul class="sub-list">
+                {% for sub in subscriptions %}
+                <li class="sub-item">
+                    <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
+                    <div class="sub-info">
+                        <p class="sub-name">{{ sub.name }}</p>
+                        <p class="sub-meta">{{ sub.billingCycle | lower | capitalize }}</p>
+                    </div>
+                    <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
+                    <div class="sub-actions">
+                        <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
+                           class="btn-icon" aria-label="Edit {{ sub.name }}">
+                            <i class="ti ti-edit"></i>
+                        </a>
+                        <form action="/subscriptions/{{ sub.subscriptionId }}/delete"
+                              method="post" style="display:contents">
+                            <button type="submit" class="btn-icon delete"
+                                    aria-label="Delete {{ sub.name }}"
+                                    onclick="return confirm('Delete {{ sub.name }}?')">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <section class="dash-section">
+        <div class="section-header">
+            <h2>Recent payments</h2>
+            <a href="/payments" class="btn-ghost">View all <i class="ti ti-arrow-right"></i></a>
+        </div>
+
+        {% if recentPayments is null or recentPayments is empty %}
+            <div class="dash-empty">
+                <i class="ti ti-receipt-off"></i>
+                <p>No payments logged yet.</p>
+            </div>
+        {% else %}
+            <ul class="payment-list">
+                {% for p in recentPayments %}
+                <li class="payment-item">
+                    <div class="payment-icon">
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <p class="payment-name">{{ p.subscriptionName }}</p>
+                        <p class="payment-date">{{ p.paidOn }}</p>
+                    </div>
+                    <p class="payment-amount">{{ p.currency }} {{ p.amount }}</p>
+                    <div></div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
 </div>
 
-{% if subscriptions is empty %}
-    <p>No subscriptions yet. <a href="/subscriptions/new">Add your first one.</a></p>
-{% else %}
-    <ul class="sub-list">
-        {% for sub in subscriptions %}
-        <li class="sub-item">
-            <div class="sub-icon">{{ sub.name | slice(0, 1) }}</div>
-            <div class="sub-info">
-                <p class="sub-name">{{ sub.name }}</p>
-                <p class="sub-meta">{{ sub.billingCycle | lower | capitalize }}</p>
-            </div>
-            {% if sub.paidUntil is not null %}
-                <span class="renewal-tag renewal-ok" id="tag-{{ sub.subscriptionId }}">
-                    <i class="ti ti-check" aria-hidden="true"></i> paid
-                </span>
-            {% else %}
-                <span class="renewal-tag renewal-soon" id="tag-{{ sub.subscriptionId }}">
-                    unpaid
-                </span>
-            {% endif %}
-            <p class="sub-amount">{{ sub.currency }} {{ sub.amount }}</p>
-            <div class="sub-actions">
-                <button class="btn-icon confirm"
-                        id="paid-btn-{{ sub.subscriptionId }}"
-                        onclick="togglePaid('{{ sub.subscriptionId }}', {{ sub.paidUntil is not null }})"
-                        aria-label="Toggle paid status">
-                    {% if sub.paidUntil is not null %}
-                        <i class="ti ti-x"></i>
-                    {% else %}
-                        <i class="ti ti-check"></i>
-                    {% endif %}
-                </button>
-                <a href="/subscriptions/{{ sub.subscriptionId }}/edit"
-                   class="btn-icon" aria-label="Edit {{ sub.name }}">
-                    <i class="ti ti-edit"></i>
-                </a>
-                {% if sub.website is not null %}
-                <a href="{{ sub.website }}" target="_blank" rel="noopener"
-                   class="btn-icon" aria-label="Open {{ sub.name }} website">
-                    <i class="ti ti-external-link"></i>
-                </a>
-                {% endif %}
-                <form action="/subscriptions/{{ sub.subscriptionId }}/delete"
-                      method="post" style="display:contents">
-                    <button type="submit" class="btn-icon delete"
-                            aria-label="Delete {{ sub.name }}"
-                            onclick="return confirm('Delete {{ sub.name }}?')">
-                        <i class="ti ti-trash"></i>
-                    </button>
-                </form>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-        {% endblock %}
-
-        {% block scripts %}
-<script>
-function togglePaid(id, isPaid) {
-    var url = '/subscriptions/' + id + (isPaid ? '/mark-unpaid' : '/mark-paid');
-    var tag = document.getElementById('tag-' + id);
-    var btn = document.getElementById('paid-btn-' + id);
-
-    fetch(url, { method: 'POST' })
-        .then(function(res) {
-            if (!res.ok) return;
-            if (isPaid) {
-                tag.className = 'renewal-tag renewal-soon';
-                tag.innerHTML = 'unpaid';
-                btn.querySelector('i').className = 'ti ti-check';
-                btn.setAttribute('onclick', "togglePaid('" + id + "', false)");
-            } else {
-                tag.className = 'renewal-tag renewal-ok';
-                tag.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> paid';
-                btn.querySelector('i').className = 'ti ti-x';
-                btn.setAttribute('onclick', "togglePaid('" + id + "', true)");
-            }
-        });
-}
-</script>
 {% endblock %}
--e

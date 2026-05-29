@@ -42,7 +42,6 @@ public class SecurityConfig {
                                 response.sendRedirect("/auth/login")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/style.css", "/header.js").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
