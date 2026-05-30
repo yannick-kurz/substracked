@@ -1,4 +1,4 @@
-# SubsTracked
+# substracked
 
 Subscription-Tracker Webapplikation — entwickelt im Rahmen des WEBEC-Moduls FS2026 bei Silvan Zurbrügg, FHNW.
 
