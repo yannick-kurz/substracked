@@ -2,6 +2,7 @@ package ch.yannick.subtracked.app.config;
 
 import ch.yannick.subtracked.app.auth.JwtAuthFilter;
 import ch.yannick.subtracked.app.auth.UserDetailsServiceImpl;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +42,8 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendRedirect("/auth/login")))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/style.css", "/header.js", "/logo.svg").permitAll() // ← neu
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
