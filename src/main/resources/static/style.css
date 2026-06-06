@@ -532,14 +532,12 @@ form button[type="submit"]:not(.btn-icon) {
     top:           calc(100% + var(--sp-2));
     right:         0;
     min-width:     13rem;
-    background:    var(--bg-card);
+    background:    var(--bg-card-solid);
     border:        0.0625rem solid var(--border);
     border-radius: var(--r-lg);
-    box-shadow:    0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    box-shadow:    0 0.5rem 2rem rgba(83, 74, 183, 0.12);
     z-index:       200;
     overflow:      hidden;
-    backdrop-filter:         var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
 
     &[hidden] { display: none; }
 }
@@ -571,7 +569,8 @@ form button[type="submit"]:not(.btn-icon) {
     text-decoration: none;
     transition:      background 0.15s;
 
-    &:hover { background: rgba(83,74,183,0.06); text-decoration: none; }
+    &:hover { background: var(--purple-light); text-decoration: none; }
+    [data-theme="dark"] &:hover { background: #2a2645; }
 
     &--danger { color: var(--danger); }
     &--danger:hover { background: var(--danger-light); }
@@ -904,7 +903,9 @@ main {
    FORM CARD
 ───────────────────────────────────────────────────── */
 .form-card {
-    background:              var(--bg-card-solid);
+    background:              var(--bg-card);
+    backdrop-filter:         var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     border:                  0.0625rem solid var(--border);
     border-radius:           var(--r-2xl);
     padding:                 var(--sp-8);
@@ -1370,14 +1371,12 @@ main {
     top:           calc(100% + var(--sp-2));
     right:         0;
     width:         20rem;
-    background:    var(--bg-card);
+    background:    var(--bg-card-solid);
     border:        0.0625rem solid var(--border);
     border-radius: var(--r-lg);
-    box-shadow:    0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    box-shadow:    0 0.5rem 2rem rgba(83, 74, 183, 0.12);
     z-index:       200;
     overflow:      hidden;
-    backdrop-filter:         var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
 
     &[hidden] { display: none; }
 }
@@ -1426,7 +1425,8 @@ main {
     transition:  background 0.15s;
 
     &:last-child  { border-bottom: none; }
-    &:hover       { background: rgba(83, 74, 183, 0.04); }
+    &:hover       { background: var(--purple-light); }
+    [data-theme="dark"] &:hover { background: #2a2645; }
 
     & .notif-item-icon {
         width:         2rem;

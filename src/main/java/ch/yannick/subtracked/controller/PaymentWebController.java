@@ -6,6 +6,7 @@ import ch.yannick.subtracked.domain.payment.PaymentResponse;
 import ch.yannick.subtracked.domain.user.User;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,10 +69,11 @@ public class PaymentWebController {
         return "payments";
     }
 
+    @Transactional
     @PostMapping("/{id}/delete")
     public String delete(@AuthenticationPrincipal User user,
                          @PathVariable UUID id) {
-        paymentRepository.deleteByUserIdAndId(user.getId(), id);
+        paymentRepository.deleteByIdAndUserId(id, user.getId());
         return "redirect:/payments";
     }
 }

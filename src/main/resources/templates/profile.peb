@@ -11,101 +11,135 @@
             {{ currentUser.firstName | slice(0, 1) }}{{ currentUser.lastName | slice(0, 1) }}
         </div>
         <div>
-            <h1 style="margin-bottom: 0.125rem">{{ currentUser.firstName }} {{ currentUser.lastName }}</h1>
+            <h1 style="margin-bottom: 0.125rem">
+                {{ currentUser.firstName }} {{ currentUser.lastName }}
+            </h1>
             <p class="text-muted">{{ currentUser.username }}</p>
         </div>
     </div>
 
     <div class="settings-grid">
 
-    <section class="form-card">
-        <h2 style="margin-bottom: 1.25rem">Account</h2>
+        <section class="form-card">
+            <h2 style="margin-bottom: var(--sp-5)">Account</h2>
 
-        {% if error is defined %}
-            <p class="form-error">{{ error }}</p>
-        {% endif %}
+            {% if error is defined %}
+                <p class="form-error">{{ error }}</p>
+            {% endif %}
             {% if success is defined %}
-            <p class="form-success">{{ success }}</p>
-        {% endif %}
+                <p class="form-success">{{ success }}</p>
+            {% endif %}
 
-        <form method="post" action="/profile/update">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="firstName">First name</label>
-                    <input type="text" id="firstName" name="firstName"
-                           value="{{ currentUser.firstName }}" required>
+            <form method="post" action="/profile/update">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First name</label>
+                        <input type="text" id="firstName" name="firstName"
+                               value="{{ currentUser.firstName }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last name</label>
+                        <input type="text" id="lastName" name="lastName"
+                               value="{{ currentUser.lastName }}" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="lastName">Last name</label>
-                    <input type="text" id="lastName" name="lastName"
-                           value="{{ currentUser.lastName }}" required>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email"
+                           value="{{ currentUser.username }}" required>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email"
-                       value="{{ currentUser.username }}" required>
-            </div>
-            <div class="form-actions">
-                <button type="submit">Save changes</button>
-            </div>
-        </form>
-    </section>
-
-    <section class="form-card">
-        <h2 style="margin-bottom: 1.25rem">Preferences</h2>
-
-        <div class="setting-row">
-            <div>
-                <p class="setting-label">Appearance</p>
-                <p class="setting-hint">Choose your preferred theme</p>
-            </div>
-            <div class="theme-btns">
-                <button class="theme-btn" id="btn-light" onclick="setTheme('light')">
-                    <i class="ti ti-sun"></i> Light
-                </button>
-                <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">
-                    <i class="ti ti-moon"></i> Dark
-                </button>
-            </div>
-        </div>
-
-        <div class="setting-row">
-            <div>
-                <p class="setting-label">Default currency</p>
-                <p class="setting-hint">Used for new subscriptions</p>
-            </div>
-            <select class="select-sm">
-                <option>CHF</option>
-                <option>EUR</option>
-                <option>USD</option>
-                <option>GBP</option>
-            </select>
-        </div>
-    </section>
-
-    <section class="form-card">
-        <h2 style="margin-bottom: 1.25rem">Security</h2>
-
-        <div class="setting-row">
-            <div>
-                <p class="setting-label">Password</p>
-                <p class="setting-hint">Change your login password</p>
-            </div>
-            <a href="/profile/change-password" class="btn-outline">Update</a>
-        </div>
-
-        <div class="setting-row" style="border-bottom: none">
-            <div>
-                <p class="setting-label">Delete account</p>
-                <p class="setting-hint">Permanently remove all your data</p>
-            </div>
-            <form method="post" action="/profile/delete">
-                <button type="submit" class="btn-danger">Delete</button>
+                <div class="form-actions">
+                    <button type="submit">Save changes</button>
+                </div>
             </form>
-        </div>
-    </section>
+        </section>
 
+        <section class="form-card">
+            <h2 style="margin-bottom: var(--sp-5)">Change password</h2>
+
+            {% if passwordError is defined %}
+                <p class="form-error">{{ passwordError }}</p>
+            {% endif %}
+            {% if passwordSuccess is defined %}
+                <p class="form-success">{{ passwordSuccess }}</p>
+            {% endif %}
+
+            <form method="post" action="/profile/change-password">
+                <div class="form-group">
+                    <label for="currentPassword">Current password</label>
+                    <input type="password" id="currentPassword"
+                           name="currentPassword"
+                           placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New password</label>
+                    <input type="password" id="newPassword"
+                           name="newPassword"
+                           placeholder="min. 8 characters"
+                           minlength="8" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm new password</label>
+                    <input type="password" id="confirmPassword"
+                           name="confirmPassword"
+                           placeholder="repeat new password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit">Update password</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="form-card">
+            <h2 style="margin-bottom: var(--sp-5)">Preferences</h2>
+
+            <div class="setting-row">
+                <div>
+                    <p class="setting-label">Appearance</p>
+                    <p class="setting-hint">Choose your preferred theme</p>
+                </div>
+                <div class="theme-btns">
+                    <button class="theme-btn" id="btn-light" onclick="setTheme('light')">
+                        <i class="ti ti-sun"></i> Light
+                    </button>
+                    <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">
+                        <i class="ti ti-moon"></i> Dark
+                    </button>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <p class="setting-label">Default currency</p>
+                    <p class="setting-hint">Used for new subscriptions</p>
+                </div>
+                <select class="select-sm">
+                    <option>CHF</option>
+                    <option>EUR</option>
+                    <option>USD</option>
+                    <option>GBP</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="form-card">
+            <h2 style="margin-bottom: var(--sp-5)">Danger zone</h2>
+
+            <div class="setting-row" style="border-bottom: none">
+                <div>
+                    <p class="setting-label">Delete account</p>
+                    <p class="setting-hint">Permanently remove all your data. This cannot be undone.</p>
+                </div>
+                <form method="post" action="/profile/delete">
+                    <button type="submit" class="btn-danger"
+                            onclick="return confirm('Are you sure? This will permanently delete your account and all data.')">
+                        Delete account
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </div>
 </div>
 
 {% endblock %}
@@ -120,6 +154,7 @@ function setTheme(t) {
     var icon = document.getElementById('theme-icon');
     if (icon) icon.className = t === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
 }
+
 var saved = localStorage.getItem('substracked-theme') || 'light';
 document.getElementById('btn-' + saved).classList.add('active');
 </script>
